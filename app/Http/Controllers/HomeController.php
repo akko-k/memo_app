@@ -30,7 +30,7 @@ class HomeController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        return view('create');
+        return view('home', compact('memos'));
     }
 
     public function store(Request $request)
