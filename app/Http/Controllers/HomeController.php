@@ -39,4 +39,17 @@ class HomeController extends Controller
         Memo::insert(['content' => $post['content'], 'user_id' => \Auth::id()]);
         return redirect(route('home'));
     }
+
+    public function edit($id)
+    {
+        $memos = MEMO::select('memos.*')
+            ->where('user_id', '=', \Auth::id())
+            ->whereNull('deleted_at')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        $edit_memo = MEMO::find($id);
+
+        return view('edit', compact('memos', 'edit_memo'));
+    }
 }
