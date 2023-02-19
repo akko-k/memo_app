@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Memo;
+use App\Models\Tag;
+use App\Models\MemoTag;
+use DB;
 
 class HomeController extends Controller
 {
@@ -36,7 +39,14 @@ class HomeController extends Controller
     public function store(Request $request)
     {
         $post = $request->all();
-        Memo::insert(['content' => $post['content'], 'user_id' => \Auth::id()]);
+        DB::transaction(function () use ($post) {
+            $memo_id = Memo::insertGetId(['content' => $post['content'], 'user_id' => \Auth::id()]);
+            $tag_exists = Tag::where('name', '=', $post['new_tag'])->where('user_id', '=', \Auth::id())->exists();
+            if (!empty($post['new_tag']) && !$tag_exists) {
+                $tag_id = Tag::insertGetId(['name' => $post['new_tag'], 'user_id' => \Auth::id()]);
+                MemoTag::insert(['memo_id' => $memo_id, 'tag_id' => $tag_id]);
+            }
+        });
         return redirect(route('home'));
     }
 
