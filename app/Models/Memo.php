@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder; //追加
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class Memo extends Model
 {
-    // ユーザーを指定
-    public function scopeUser($query)
+    // モデルの初期起動メソッド
+    protected static function booted()
     {
-        return $query->where('user_id', Auth::id());
+        static::addGlobalScope('user_id', function (Builder $builder) {
+            $builder->where('user_id', Auth::id());
+        });
     }
 
-    // 有効なものを指定
+    // 有効な（論理削除されていない）メモを指定
     public function scopeActive($query)
     {
         return $query->whereNull('deleted_at');

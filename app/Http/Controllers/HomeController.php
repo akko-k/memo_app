@@ -27,7 +27,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $memos = Memo::user()->active()->orderBy('updated_at', 'desc')->get();
+        $memos = Memo::active()->orderBy('updated_at', 'desc')->get();
 
         return view('create', compact('memos'));
     }
